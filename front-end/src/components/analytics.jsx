@@ -136,8 +136,8 @@ export default function Analytics() {
     }
   }, [reportedBugs]);
   const getUsers = () => {
-    axios.get("http://localhost:3050/users").then((resp) => {
-    // axios.get("https://backflipt-accounts.onrender.com/users").then((resp) => {
+    //axios.get("http://localhost:3050/users").then((resp) => {
+    axios.get("https://backflipt-accounts.onrender.com/users").then((resp) => {
       setUsers(resp.data);
     });
   };
