@@ -1,0 +1,23 @@
+if (!logged) {
+      if (checkAuth()) {
+        dispatcher(
+          setLogins([true, cookie.get("username")]),
+          setAdmin((cookie.get("role")==='true'))
+        );
+
+        navigate("/bug-hunter");
+      } else {
+        navigate("/bug-hunter/login");
+      }
+    }
+
+<Dropdown.Item
+                    name="Logout"
+                    active={activeItem === "Logout"}
+                    onClick={destroySession}
+                    position="right"
+                    style={{ background: "#BB3F3F" }}
+                  >
+                    Logout{" "}
+                    <Icon name="log out" style={{ marginLeft: "5px" }}></Icon>
+                  </Dropdown.Item>

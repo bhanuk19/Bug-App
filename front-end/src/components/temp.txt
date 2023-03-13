@@ -1,0 +1,29 @@
+<div
+      className="more-details"
+      style={visibility ? { display: "block" } : { display: "none" }}
+    >
+      <span>
+        <b>Description: </b>
+        {bug.bugDescription}
+      </span>
+      <span>
+        <b>Bug URL: </b>
+        {bug.bugURL}
+      </span>
+      <span>
+        <b>Reported on: </b>
+        {bug.createdAt.substr(0, 10) + " @ " + bug.createdAt.substr(11, 8)}
+      </span>
+      <span>
+        <b>Last Updated on: </b>
+        {bug.updatedAt.substr(0, 10) + " @ " + bug.updatedAt.substr(11, 8)}
+      </span>
+      <div>
+        <button onClick={handleApproval} style={{ background: "#0f0" }}>
+          Approve
+        </button>
+        <button onClick={handleReject} style={{ background: "#f00" }}>
+          Reject
+        </button>
+      </div>
+    </div>
