@@ -16,15 +16,18 @@ export default function Root(props) {
       if (res) {
         dispatcher(
           setLogins([res, cookie.get("username")]),
-          setAdmin(cookie.get("role") === "true")
+          setAdmin(cookie.get("admin") === "true")
         );
       } else {
-        cookie.set("session_id", "", { path: "/", expires: new Date() });
+        Object.keys(cookie.getAll()).map((ele) => {
+          cookie.set(ele, "", { path: "/", expires: new Date() });
+          return 0;
+        });
         dispatcher(setLogins([false, null]), setAdmin(false));
-        navigate("/bug-hunter/login")
+        navigate("/bug-hunter/login");
       }
     });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
     <>

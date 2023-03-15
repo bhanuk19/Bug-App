@@ -19,7 +19,7 @@ export default function NavbarLg({ destroySession, logged }) {
               to="dashboard"
               className="home-link"
             />
-            {cookie.get("role") === "true" ? (
+            {cookie.get("admin") === "true" ? (
               <>
                 <Menu.Item
                   name="Fixes"

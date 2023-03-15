@@ -3,10 +3,7 @@ import { Schema as _Schema, model } from "mongoose";
 
 // Define Reported Schema
 const Schema = _Schema;
-const Image = new Schema({
-  data: Buffer,
-  contentType: String,
-});
+
 const Reported = new Schema(
   {
     bugName: { type: String, required: true },
@@ -32,7 +29,7 @@ const Reported = new Schema(
       default:""
     },
     bugImages: {
-      type: [Image],
+      type: Array,
       default: null,
       required: true,
     },

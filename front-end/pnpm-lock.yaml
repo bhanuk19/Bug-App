@@ -14,6 +14,7 @@ specifiers:
   react: ^18.2.0
   react-dom: ^18.2.0
   react-favicon: ^1.0.1
+  react-qr-code: ^2.0.11
   react-redux: ^8.0.5
   react-responsive: ^9.0.2
   react-router-dom: ^6.8.1
@@ -39,6 +40,7 @@ dependencies:
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
   react-favicon: 1.0.1_react@18.2.0
+  react-qr-code: 2.0.11_react@18.2.0
   react-redux: 8.0.5_egguyi6kvemdtrnkbl3bdoeaey
   react-responsive: 9.0.2_react@18.2.0
   react-router-dom: 6.8.1_biqbaboplfbrettd7655fr4n2y
@@ -8575,6 +8577,10 @@ packages:
     engines: {node: '>=0.6.0', teleport: '>=0.2.0'}
     dev: false
 
+  /qr.js/0.0.0:
+    resolution: {integrity: sha512-c4iYnWb+k2E+vYpRimHqSu575b1/wKl4XFeJGpFmrJQz5I88v9aY2czh7s0w36srfCM1sXgC/xpoJz5dJfq+OQ==}
+    dev: false
+
   /qs/6.11.0:
     resolution: {integrity: sha512-MvjoMCJwEarSbUYk5O+nmoSzSutSsTwF85zcHPQ9OrlFoZOYIjaqBAJIqIXjptyD5vThxGq52Xu/MaJzRkIk4Q==}
     engines: {node: '>=0.6'}
@@ -8735,6 +8741,20 @@ packages:
       react-dom: 18.2.0_react@18.2.0
       react-fast-compare: 3.2.0
       warning: 4.0.3
+    dev: false
+
+  /react-qr-code/2.0.11_react@18.2.0:
+    resolution: {integrity: sha512-P7mvVM5vk9NjGdHMt4Z0KWeeJYwRAtonHTghZT2r+AASinLUUKQ9wfsGH2lPKsT++gps7hXmaiMGRvwTDEL9OA==}
+    peerDependencies:
+      react: ^16.x || ^17.x || ^18.x
+      react-native-svg: '*'
+    peerDependenciesMeta:
+      react-native-svg:
+        optional: true
+    dependencies:
+      prop-types: 15.8.1
+      qr.js: 0.0.0
+      react: 18.2.0
     dev: false
 
   /react-redux/8.0.5_egguyi6kvemdtrnkbl3bdoeaey:

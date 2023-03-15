@@ -102,7 +102,7 @@ function NavbarMb({ logged, destroySession }) {
               to="dashboard"
               className="home-link"
             />
-            {cookie.get("role") === "true" ? (
+            {cookie.get("admin") === "true" ? (
               <>
                 <Menu.Item
                   name="Fixes"

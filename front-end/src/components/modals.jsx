@@ -319,6 +319,7 @@ export const ApprovedModal = ({
     dispatcher(setSelected(id));
     navigate("/bug-hunter/fix");
   };
+  console.log(bug);
   return (
     <div className="more-details">
       <span className="close-button">
@@ -412,6 +413,41 @@ export const ApprovedModal = ({
         <b>Last Updated on: </b>
         {bug.updatedAt.substr(0, 10) + " @ " + bug.updatedAt.substr(11, 8)}
       </span>
+      <span>
+        <b>Bug Images: </b>
+      </span>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "flex-start",
+          width: "50%",
+        }}
+      >
+        {bug.bugImages ? (
+          bug.bugImages.map((img, index) => {
+            return (
+              <a
+                href={img}
+                target="_blank"
+                rel="noreferrer"
+                key={index}
+                className="modalImageLink"
+                style={{ width: "50px", height: "50px", marginLeft:"30px" }}
+              >
+                <img
+                  src={img}
+                  alt={"Bug image " + index + 1}
+                  className="modalImage"
+                  style={{ width: "100%", height: "100%" }}
+                />
+              </a>
+            );
+          })
+        ) : (
+          <></>
+        )}
+      </div>
       <div>
         <button
           style={{ color: "#fff", background: "#007bff" }}

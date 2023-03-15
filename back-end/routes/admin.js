@@ -1,9 +1,10 @@
 import express from "express";
 import { urlencoded, json } from "body-parser";
 import { filter, propEq } from "ramda";
-import upload from "express-fileupload";
+// import upload from "express-fileupload";
 import * as axios from "axios";
 //MongoDB and Mongoose Models
+import * as R from "ramda";
 import Reported from "../Models/reported";
 import { config } from "dotenv";
 config();
@@ -12,7 +13,7 @@ import Fixes from "../Models/fixes";
 import cookieParser from "cookie-parser";
 //Middleware
 const app = express();
-app.use(upload());
+// app.use(upload());
 app.use(urlencoded({ extended: true }));
 app.use(json());
 app.use(cookieParser());
@@ -113,6 +114,12 @@ app.get("/reported/:page", (req, res) => {
     .then((resp) => {
       if (resp.data[0] && resp.data[1]) {
         Reported.find({}, async (err, data) => {
+          const diff = function (a, b) {
+            return (
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            );
+          };
+          data = R.sort(diff, data);
           req.params.page === "All".toLowerCase()
             ? res.send(data)
             : res
@@ -189,7 +196,7 @@ app.post("/updatePriority", (req, res) => {
 });
 
 app.post("/assignBug", (req, res) => {
-  console.log(req.body);
+  // console.log(req.body);
   Reported.findByIdAndUpdate(
     req.body._id,
     { assignedTo: req.body.username, status: "Assigned" },

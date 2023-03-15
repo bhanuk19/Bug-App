@@ -35,7 +35,10 @@ export const logout = async () => {
     )
     .then((response) => response.data)
     .then((data) => {
-      cookie.set("session_id", "", { path: "/", expires: new Date() });
+      Object.keys(cookie.getAll()).map((ele) => {
+        cookie.set(ele, "", { path: "/", expires: new Date() });
+        return 0;
+      });
       flag = data;
     });
   return flag;

@@ -7,6 +7,8 @@ export default function Report() {
   const [nameExist, setBoolExist] = useState(false);
   const [bugName, setBugName] = useState("");
   const [bugURL, setBugURL] = useState("");
+  const [images, setImages] = useState({});
+  const [fileCount, setFileCount] = useState(0);
   const [bugMessage, setBugMessage] = useState("");
   const [priority, setPriority] = useState("Select Priority");
   const navigate = useNavigate();
@@ -18,6 +20,15 @@ export default function Report() {
       return false;
     }
   };
+  const onFileChange = (e) => {
+    e.target.files
+      ? setFileCount((fileCount) => fileCount + 1)
+      : setFileCount(fileCount);
+    let tempImages = { ...images };
+    tempImages[fileCount] = e.target.files[0];
+    setImages(tempImages);
+  };
+
   const handleReport = () => {
     if (bugName === "") {
       document.getElementById("err").innerHTML = "Bug Name cannot be empty!";
@@ -43,16 +54,24 @@ export default function Report() {
       document.getElementById("err").innerHTML = "Select Priority";
       return;
     }
+    let data = new FormData(document.querySelector("form"));
+    let keys = Object.keys(images);
+    keys.pop();
+    keys.map((key) => {
+      data.append("images", images[key]);
+      return 0;
+    });
+
     axios
-      .post("/reportBug", new FormData(document.querySelector("form")), {
+      .post("/reportBug", data, {
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "multipart/form-data",
         },
       })
       .then((response) => {
         if (response.status === 201) {
           alert("Success");
-          navigate("/dashboard");
+          navigate("/bug-hunter/dashboard");
           // document.querySelector("form").reset()
         } else {
           alert("Failure");
@@ -129,8 +148,14 @@ export default function Report() {
             setBugMessage(e.target.value);
           }}
         ></textarea>
+        <input
+          type="file"
+          name="images"
+          id="images"
+          accept="image/*"
+          onChange={onFileChange}
+        />
         <textarea name="Comments" placeholder="//Comments"></textarea>
-        <label htmlFor="priority">Priority: </label>
         <select
           name="priority"
           id="priority"

@@ -6,13 +6,28 @@ import * as axios from "axios";
 import { config } from "dotenv";
 import conn from "./connection/mongoose";
 import Reported from "./Models/reported";
-import upload from "express-fileupload";
+// import upload from "express-fileupload";
+import Cryptr from "cryptr";
 config();
 const app = express();
-app.use(upload());
+// app.use(upload());
 app.use(json());
 app.use(urlencoded({ extended: true }));
 app.use(cors());
+app.use("/uploads", express.static(__dirname + "/uploads"));
+
+// app.use((req, res, next) => {
+//   const encryption = new Cryptr(req.body.key);
+//   if (req.body.action === "encrypt") {
+//     req.body["out"] = encryption.encrypt(req.body.message);
+//   } else {
+//     req.body["out"] = encryption.decrypt(req.body.message);
+//   }
+//   next();
+// });
+// app.post("/encrypt-decrypt", (req, res) => {
+//   res.send(req.body);
+// });
 
 //Importing Routes from Users and Admin Modules
 app.post("/auth", (req, res) => {
@@ -62,10 +77,10 @@ app.get("/health", async (req, res) => {
   res.send(health);
 });
 import users from "./routes/users";
+app.use(users); //Using User Routes
 import admin from "./routes/admin";
 import { ReturnDocument } from "mongodb";
 app.use(admin); //Using Admin Routes
-app.use(users); //Using User Routes
 
 app.post("/logout", (req, res) => {
   axios

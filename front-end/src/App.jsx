@@ -14,6 +14,7 @@ import Fixed from "./components/fixed";
 import Reported from "./components/reported";
 import Assigned from "./components/assigned";
 import Analytics from "./components/analytics";
+import Temp from "./components/temp";
 
 const router = createBrowserRouter([
   {
@@ -71,6 +72,10 @@ const router = createBrowserRouter([
       {
         path: "health",
         element: <Health />,
+      },
+      {
+        path: "temp",
+        element: <Temp />,
       },
       {
         path: "*",

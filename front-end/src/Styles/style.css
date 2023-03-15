@@ -131,7 +131,7 @@ thead tr {
   width: 100%;
   display: none;
   background: #00000039;
-  z-index: 1;
+  z-index: 4;
   position: fixed;
   top: 0;
   left: 0;
