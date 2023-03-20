@@ -3,17 +3,11 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { ApprovedModal } from "./modals";
 import { sortDateAscend, sortDateDesc } from "../functions/filters";
-// import { checkAuth } from "../functions/auth";
-// import { useDispatch } from "react-redux";
-// import { setAdmin, setLogins } from "../reducers/globalStates";
-// import { useNavigate } from "react-router-dom";
 import Cookies from "universal-cookie";
 import { Table, Header } from "semantic-ui-react";
 export default function Reported(props) {
   //Local States
   const cookie = new Cookies();
-  // const dispatcher = useDispatch();
-  // const navigate = useNavigate();
   const [userBugs, setUserBugs] = useState(false);
   const [ascend, setAscend] = useState(false);
   const [action, setAction] = useState(false);

@@ -1,9 +1,9 @@
 import axios from "axios";
-import React, { PureComponent, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PieChart, Pie, Sector, ResponsiveContainer } from "recharts";
 import Cookies from "universal-cookie";
-import { Search, Grid, Header, Segment } from "semantic-ui-react";
+// import { Search, Grid, Header, Segment } from "semantic-ui-react";
 
 const renderActiveShape = (props) => {
   const RADIAN = Math.PI / 180;
@@ -120,6 +120,7 @@ export default function Analytics() {
         navigate("/bug-hunter/login");
       });
   };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(getFrequncy, []);
   useEffect(() => {
     if (reportedBugs) {
@@ -175,6 +176,7 @@ export default function Analytics() {
           if (ele["assignedTo"] === e.target.value) {
             temp["assigned"] += 1;
           }
+          return 0;
         });
         let userFreq = [];
         Object.keys(temp).forEach((ele) => {
@@ -193,6 +195,7 @@ export default function Analytics() {
       <div style={styles}>
         <div style={stylesReports}>
           <h1>Report</h1>
+          <h3>Total Reported: {frequency[0].value}</h3>
           <ResponsiveContainer width={500} height={260}>
             <PieChart width={400} height={400}>
               <Pie

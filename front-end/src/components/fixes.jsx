@@ -1,13 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import { FixModal } from "./modals";
-import { useNavigate } from "react-router-dom";
 import { sortDateAscend, sortDateDesc } from "../functions/filters";
-import { Sticky, Table } from "semantic-ui-react";
+import { Header, Pagination, Table } from "semantic-ui-react";
 import axios from "axios";
-import Cookies from "universal-cookie";
+import { useNavigate } from "react-router-dom";
 export default function Fixes() {
-  const navigate = useNavigate();
   const tableHead = [
     "FixID",
     "Added By",
@@ -16,54 +14,70 @@ export default function Fixes() {
     "Date",
     "Action",
   ];
-  const [fixes, setFixed] = useState(false);
+  const [fixes, setFixes] = useState(false);
   const [action, setAction] = useState(false);
+  const [ascend, setAscend] = useState(false);
   const [fixID, setID] = useState(null);
   const [modalVisibility, setVisibility] = useState(false);
-  const getFixes = () => {
-    setVisibility(null);
-    axios
-      .post(
-        "/fixes",
-        { admin: true },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      )
-      .then((response) => {
-        if (response.data?.auth === false) {
-          alert("Unauthorized");
-          navigate("/dashboard");
-        } else {
-          setFixed(response.data);
-        }
-      })
-      .catch((err) => {
-        let cookie = new Cookies();
-        cookie.set("session_id", "", { path: "/", expires: new Date() });
-        navigate("/bug-hunter/login");
-      });
-  };
+  const [pages, setPages] = useState(null);
+  const [filtered, setFiltered] = useState(false);
+  const [activePage, setActivePage] = useState(0);
+  const navigate = useNavigate();
+  useEffect(() => {
+    axios.get("/fixes/" + activePage).then((response) => {
+      if (response.data?.auth === false) {
+        alert("Unauthorized");
+        navigate("/dashboard");
+      } else {
+        setFixes(response.data[0]);
+        setPages(Math.ceil(response.data[1] / 10));
+        setFiltered(response.data[0]);
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  useEffect(() => {}, [fixes, modalVisibility, filtered]);
 
+  //Show Modal function
   const handleAction = (e) => {
     setID(e.target.parentNode.parentNode.id);
     setVisibility(true);
   };
-
-  const [ascend, setAscend] = useState(false);
+  //Sort Table based on
   const sortFunction = () => {
-    ascend ? setFixed(sortDateDesc(fixes)) : setFixed(sortDateAscend(fixes));
+    ascend ? setFixes(sortDateDesc(fixes)) : setFixes(sortDateAscend(fixes));
     setAscend(!ascend);
   };
-
-  useEffect(getFixes, [action]);
-  return fixes ? (
+  const handleSearch = (e) => {
+    let filteredBySearch = fixes.filter((row) => {
+      return Object.values(row).some((value) => {
+        if (isNaN(value))
+          return value.toLowerCase().includes(e.target.value.toLowerCase());
+        return false;
+      });
+    });
+    setFiltered(filteredBySearch);
+  };
+  return filtered ? (
     <>
       <div className="form-div">
-        <h2>Fixes</h2>
-        <Table celled inverted selectable fixed>
+        <div className="head-div">
+          <Header size="huge">Submitted Fixes</Header>
+          <div>
+            <div className="search" style={{ marginTop: "0px" }}>
+              <input
+                type="text"
+                className="searchTerm"
+                id="searchBar"
+                placeholder="Search in this page.."
+                onChange={handleSearch}
+              />
+              <i className="fa fa-search searchButton"></i>
+            </div>
+          </div>
+        </div>
+        {filtered.length ? (
+          <Table celled inverted selectable fixed>
             <Table.Header>
               <Table.Row>
                 {tableHead.map((ele, index) =>
@@ -85,39 +99,65 @@ export default function Fixes() {
                 )}
               </Table.Row>
             </Table.Header>
-          <Table.Body>
-            {fixes.map((fix, index) => {
-              return (
-                <Table.Row
-                  key={fix._id}
-                  className="fix-bug-list-element"
-                  id={fix._id}
-                >
-                  <Table.Cell>{fix._id}</Table.Cell>
-                  <Table.Cell>{fix.fixedBy}</Table.Cell>
-                  <Table.Cell>
-                    {fix.fixDescription.substr(0, 10) + "...."}
-                  </Table.Cell>
-                  <Table.Cell>{fix.status}</Table.Cell>
-                  <Table.Cell>{fix.createdAt.substr(0, 10)}</Table.Cell>
-                  <Table.Cell>
-                    <button
-                      onClick={handleAction}
-                      style={{
-                        color: "#fff",
-                        background: "#007bff",
-                        padding: "5px 10px",
-                        borderRadius: "5px",
-                      }}
-                    >
-                      View
-                    </button>
-                  </Table.Cell>
-                </Table.Row>
-              );
-            })}
-          </Table.Body>
-        </Table>
+            <Table.Body>
+              {fixes.map((fix, index) => {
+                return (
+                  <Table.Row
+                    key={fix._id}
+                    className="fix-bug-list-element"
+                    id={fix._id}
+                  >
+                    <Table.Cell>{fix._id}</Table.Cell>
+                    <Table.Cell>{fix.fixedBy}</Table.Cell>
+                    <Table.Cell>
+                      {fix.fixDescription.substr(0, 10) + "...."}
+                    </Table.Cell>
+                    <Table.Cell>{fix.status}</Table.Cell>
+                    <Table.Cell>{fix.createdAt.substr(0, 10)}</Table.Cell>
+                    <Table.Cell>
+                      <button
+                        onClick={handleAction}
+                        style={{
+                          color: "#fff",
+                          background: "#007bff",
+                          padding: "5px 10px",
+                          borderRadius: "5px",
+                        }}
+                      >
+                        View
+                      </button>
+                    </Table.Cell>
+                  </Table.Row>
+                );
+              })}
+            </Table.Body>
+          </Table>
+        ) : (
+          <div>
+            <h1
+              style={{
+                fontSize: "25px",
+                color: "#888",
+                margin: "20px 0px",
+              }}
+            >
+              Nothing to show.....
+            </h1>
+          </div>
+        )}
+        <Pagination
+          activePage={activePage + 1}
+          style={{ marginBottom: "20px" }}
+          onPageChange={(e) => {
+            document.getElementById("searchBar").value = "";
+            setActivePage(
+              (activePage) =>
+                (activePage = parseInt(e.target.getAttribute("value")) - 1)
+            );
+            setAction(!action);
+          }}
+          totalPages={pages}
+        />
       </div>
       <div className={modalVisibility ? "overlay active" : "overlay"}>
         {fixID == null ? (

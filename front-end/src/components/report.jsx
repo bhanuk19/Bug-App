@@ -21,12 +21,15 @@ export default function Report() {
     }
   };
   const onFileChange = (e) => {
-    e.target.files
-      ? setFileCount((fileCount) => fileCount + 1)
-      : setFileCount(fileCount);
-    let tempImages = { ...images };
-    tempImages[fileCount] = e.target.files[0];
-    setImages(tempImages);
+    if (fileCount < 2) {
+      e.target.files[0]
+        ? setFileCount((fileCount) => fileCount + 1)
+        : setFileCount(fileCount);
+      let tempImages = { ...images };
+      tempImages[fileCount] = e.target.files[0];
+      setImages({ ...tempImages });
+      e.target.value = "";
+    }
   };
 
   const handleReport = () => {
@@ -77,6 +80,12 @@ export default function Report() {
           alert("Failure");
         }
       });
+  };
+  const deleteImage = (index) => {
+    let temp = { ...images };
+    delete temp[index];
+    setImages(temp);
+    setFileCount((fileCount) => fileCount - 1);
   };
   useEffect(() => {
     if (bugName === "") {
@@ -155,6 +164,20 @@ export default function Report() {
           accept="image/*"
           onChange={onFileChange}
         />
+        <div className="images">
+          {Object.keys(images).map((image, index) => {
+            return (
+              <div key={index} className="image">
+                <span>{images[image].name.substr(0, 8)}</span>
+                <i
+                  style={{ marginLeft: "10px" }}
+                  className="fa-regular fa-circle-xmark"
+                  onClick={() => deleteImage(index)}
+                ></i>
+              </div>
+            );
+          })}
+        </div>
         <textarea name="Comments" placeholder="//Comments"></textarea>
         <select
           name="priority"

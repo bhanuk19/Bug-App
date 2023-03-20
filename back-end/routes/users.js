@@ -1,18 +1,18 @@
 import express from "express";
-import { urlencoded, json } from "body-parser";
-import { filter, propEq } from "ramda";
+import * as bodyParser from "body-parser";
+import multer from "multer";
 import { config } from "dotenv";
 import * as R from "ramda";
 config();
 import * as axios from "axios";
 import uuidv4 from "uuid";
+//Mongoose Models
 import Reported from "../Models/reported";
-// import User from "../Models/user";
 import Fixes from "../Models/fixes";
+//
+import { sortDateDesc } from "../functions/filters";
 
-import * as bodyParser from "body-parser";
-
-import multer from "multer";
+//Multer Functions for Uploading Images from request with unique names
 const storage = multer.diskStorage({
   destination: (req, file, callBack) => {
     callBack(null, "./uploads/");
@@ -37,28 +37,11 @@ let upload = multer({
     }
   },
 });
+
 const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.raw());
-// app.use(upload());
-import sessions from "express-session";
-import cookieParser from "cookie-parser";
-app.use(cookieParser());
-
-const oneDay = 1000 * 60 * 60 * 24;
-app.use(
-  sessions({
-    secret: "thisismysecrctekeyfhrgfgrfrty84fwir767",
-    saveUninitialized: true,
-    cookie: { httpOnly: true, maxAge: oneDay },
-    resave: false,
-  })
-);
-app.use(cookieParser());
-
-app.use(urlencoded({ extended: true }));
-app.use(json());
 
 app.post("/reportBug", upload.array("images"), (req, res) => {
   if (req.body.bugName === undefined) {
@@ -94,61 +77,64 @@ app.post("/addFix", (req, res) => {
   }
 });
 
-app.get("/bugs", (req, res) => {
+app.get("/bugs/:page", (req, res) => {
   Reported.find({}, (err, data) => {
-    data = filter(propEq("status", "Approved"), data);
-    // console.log(data);
-    res.send(data);
+    data = sortDateDesc(R.filter(R.propEq("status", "Approved"), data));
+    let length = data.length;
+    req.params.page === "All".toLowerCase()
+      ? res.send(data)
+      : res
+          .status(200)
+          .send([
+            data.splice(
+              parseInt(req.params.page) ? parseInt(req.params.page) * 10 : 0,
+              10
+            ),
+            length,
+          ]);
   });
 });
 
-app.get(["/userBugs/:username", "/userBugs"], (req, res) => {
-  // console.log(req.params.username);
-  if (!req.params.username) {
-    Reported.find(
-      {
-        $or: [
-          { reportedBy: req.params.username },
-          { assignedTo: req.params.username },
-        ],
-      },
-      (err, doc) => {
-        Fixes.find({ fixedBy: req.params.username }, (err, doc2) => {
-          doc2.map((ele) => {
-            doc.push(ele);
-          });
-          if (!err) res.status(200).send(doc);
-          else res.send(false);
+app.get("/userBugs/:username", (req, res) => {
+  Reported.find(
+    {
+      $or: [
+        { reportedBy: req.params.username },
+        { assignedTo: req.params.username },
+      ],
+    },
+    (err, doc) => {
+      Fixes.find({ fixedBy: req.params.username }, (err, doc2) => {
+        doc2.map((ele) => {
+          doc.push(ele);
         });
-      }
-    );
-  } else {
-    Reported.find(
-      {
-        $or: [
-          { reportedBy: req.params.username },
-          { assignedTo: req.params.username },
-        ],
-      },
-      (err, doc) => {
-        Fixes.find({ fixedBy: req.params.username }, (err, doc2) => {
-          doc2.map((ele) => {
-            doc.push(ele);
-          });
-          if (!err) res.status(200).send(doc);
-          else res.send(false);
-        });
-      }
-    );
-  }
+        if (!err) res.status(200).send(doc);
+        else res.send(false);
+      });
+    }
+  );
 });
 
-app.get("/assigned", (req, res) => {
+app.get("/assigned/:page", (req, res) => {
   let sid = req.cookies.session_id;
   axios.get(process.env.server + "/userName/" + sid).then((resp) => {
     if (resp.data) {
-      Reported.find({ assignedTo: resp.data }, (err, result) => {
-        res.send(result);
+      Reported.find({ assignedTo: resp.data }, (err, data) => {
+        data = sortDateDesc(data);
+        let length = data.length;
+        req.params.page === "All".toLowerCase()
+          ? res.send(data)
+          : res
+              .status(200)
+              .send([
+                data.splice(
+                  parseInt(req.params.page)
+                    ? parseInt(req.params.page) * 10
+                    : 0,
+                  10
+                ),
+                length,
+              ]);
       });
     }
   });

@@ -5,7 +5,7 @@ import * as R from "ramda";
 import { sortDateAscend, sortDateDesc } from "../functions/filters";
 import { Modal } from "./modals";
 import { useNavigate } from "react-router-dom";
-import { Table, Header, Search, Dropdown, Pagination } from "semantic-ui-react";
+import { Table, Header, Pagination } from "semantic-ui-react";
 import Cookies from "universal-cookie";
 
 export default function Admin() {
@@ -61,18 +61,11 @@ export default function Admin() {
   };
   const getUsers = () => {
     // axios.get("http://localhost:3050/users").then((resp) => {
-      axios.get("https://backflipt-accounts.onrender.com/users").then((resp) => {
+    axios.get("https://backflipt-accounts.onrender.com/users").then((resp) => {
       setUsers(resp.data);
     });
   };
-  //   const setModal = () =>{
-
-  //   }
-  //   setInterval(getBugs, 1000);
-  // useEffect(getBugs, [activePage]);
-  useEffect(() => {
-    getBugs();
-  }, [action]);
+  useEffect(getBugs, [action]);
   useEffect(() => {
     if (filter !== "All") {
       setFiltered(R.filter(R.propEq("status", filter), reportedBugs));
@@ -88,8 +81,6 @@ export default function Admin() {
   };
   const selectFilter = (e) => {
     setFilter(e.target.id);
-
-    // setFiltered(R.filter(R.propEq("status", filter), reportedBugs));
   };
   const setAssignee = (e) => {
     let update = {};

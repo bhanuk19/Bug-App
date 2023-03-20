@@ -5,7 +5,6 @@ import "../Styles/style.css";
 import { useDispatch } from "react-redux";
 import { setSelected } from "../reducers/globalStates";
 import { useNavigate } from "react-router-dom";
-import Cookies from "universal-cookie";
 
 export const Modal = ({
   setAction,
@@ -15,7 +14,6 @@ export const Modal = ({
   id,
   bugs,
 }) => {
-  const cookie = new Cookies();
   const bug = R.find(R.propEq("_id", id), bugs);
   const handleApproval = (e) => {
     let bugID = bug["_id"];
@@ -154,16 +152,61 @@ export const Modal = ({
         <b>Last Updated on: </b>
         {bug.updatedAt.substr(0, 10) + " @ " + bug.updatedAt.substr(11, 8)}
       </span>
+      {bug.bugImages ? (
+        <>
+          <span>
+            <b>Bug Images: </b>
+          </span>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "flex-start",
+              width: "50%",
+            }}
+          >
+            {bug.bugImages.map((img, index) => {
+              return (
+                <a
+                  href={img}
+                  target="_blank"
+                  rel="noreferrer"
+                  key={index}
+                  className="modalImageLink"
+                  style={{ width: "50px", height: "50px", marginLeft: "30px" }}
+                >
+                  <img
+                    src={img}
+                    alt={"Bug image " + index + 1}
+                    className="modalImage"
+                    style={{ width: "100%", height: "100%" }}
+                  />
+                </a>
+              );
+            })}
+          </div>
+        </>
+      ) : (
+        <></>
+      )}
       {bug.status === "Fixed" ? (
         <></>
       ) : (
         <div>
-          <button onClick={handleApproval} style={{ background: "#218838" }}>
-            Approve
-          </button>
-          <button onClick={handleReject} style={{ background: "#DC3545" }}>
-            Reject
-          </button>
+          {bug.status === "Approved" ? (
+            <button onClick={handleApproval} style={{ background: "#218838" }}>
+              Approve
+            </button>
+          ) : (
+            <></>
+          )}
+          {bug.status === "Rejected" ? (
+            <button onClick={handleReject} style={{ background: "#DC3545" }}>
+              Reject
+            </button>
+          ) : (
+            <></>
+          )}
         </div>
       )}
     </div>
@@ -178,7 +221,6 @@ export const FixModal = ({
   id,
   bugs,
 }) => {
-  const cookie = new Cookies();
   const bug = R.find(R.propEq("_id", id), bugs);
   const navigate = useNavigate();
   const handleApproval = (e) => {
@@ -413,41 +455,45 @@ export const ApprovedModal = ({
         <b>Last Updated on: </b>
         {bug.updatedAt.substr(0, 10) + " @ " + bug.updatedAt.substr(11, 8)}
       </span>
-      <span>
-        <b>Bug Images: </b>
-      </span>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "flex-start",
-          width: "50%",
-        }}
-      >
-        {bug.bugImages ? (
-          bug.bugImages.map((img, index) => {
-            return (
-              <a
-                href={img}
-                target="_blank"
-                rel="noreferrer"
-                key={index}
-                className="modalImageLink"
-                style={{ width: "50px", height: "50px", marginLeft:"30px" }}
-              >
-                <img
-                  src={img}
-                  alt={"Bug image " + index + 1}
-                  className="modalImage"
-                  style={{ width: "100%", height: "100%" }}
-                />
-              </a>
-            );
-          })
-        ) : (
-          <></>
-        )}
-      </div>
+
+      {bug.bugImages ? (
+        <>
+          <span>
+            <b>Bug Images: </b>
+          </span>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "flex-start",
+              width: "50%",
+            }}
+          >
+            {bug.bugImages.map((img, index) => {
+              return (
+                <a
+                  href={img}
+                  target="_blank"
+                  rel="noreferrer"
+                  key={index}
+                  className="modalImageLink"
+                  style={{ width: "50px", height: "50px", marginLeft: "30px" }}
+                >
+                  <img
+                    src={img}
+                    alt={"Bug image " + index + 1}
+                    className="modalImage"
+                    style={{ width: "100%", height: "100%" }}
+                  />
+                </a>
+              );
+            })}
+          </div>
+        </>
+      ) : (
+        <></>
+      )}
+
       <div>
         <button
           style={{ color: "#fff", background: "#007bff" }}
