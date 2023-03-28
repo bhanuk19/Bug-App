@@ -6,12 +6,14 @@ import { sortDateAscend, sortDateDesc } from "../functions/filters";
 import { Modal } from "./modals";
 import { useNavigate } from "react-router-dom";
 import { Table, Header, Pagination } from "semantic-ui-react";
-import Cookies from "universal-cookie";
+import { clearCookie } from "../functions/auth";
+import { isArray } from "lodash";
 
 export default function Admin() {
   const navigate = useNavigate();
   const bugPriorities = ["Low", "Moderate", "Major", "Critical"];
   const tableHead = [
+    "Ticket",
     "Bug Name",
     "Reporter",
     "Description",
@@ -50,9 +52,8 @@ export default function Admin() {
         }
       })
       .catch((err) => {
-        let cookie = new Cookies();
-        cookie.set("session_id", "", { path: "/", expires: new Date() });
-        navigate("/bug-hunter/login");
+        clearCookie();
+        navigate("/bug-hunter/authenticate");
       });
   };
   const handleAction = (e) => {
@@ -92,12 +93,8 @@ export default function Admin() {
       })
       .then((resp) => {
         if (resp.data) {
-          alert("Assigned");
           setAction(!action);
-        } else alert("Couldn't assign try again");
-      })
-      .catch((err) => {
-        alert("Couldn't assign try again");
+        }
       });
   };
   const changePriority = (e) => {
@@ -115,14 +112,17 @@ export default function Admin() {
       });
   };
   const handleSearch = (e) => {
-    let filteredBySearch = reportedBugs.filter((row) => {
+    let filteredData = reportedBugs.filter((row) => {
       return Object.values(row).some((value) => {
-        if (isNaN(value))
-          return value.toLowerCase().includes(e.target.value.toLowerCase());
+        if (isNaN(value) || !isArray(value)) {
+          return String(value)
+            .toLowerCase()
+            .includes(e.target.value.toLowerCase());
+        }
         return false;
       });
     });
-    setFiltered(filteredBySearch);
+    setFiltered(filteredData);
   };
   return filtered ? (
     <>
@@ -201,9 +201,16 @@ export default function Admin() {
               <Table.Row>
                 {tableHead.map((ele, index) =>
                   ele !== "Date" ? (
-                    <Table.HeaderCell key={index}>{ele}</Table.HeaderCell>
+                    <Table.HeaderCell
+                      textAlign="center"
+                      key={index}
+                      colSpan={ele === "Assign To" ? "2" : "1"}
+                    >
+                      {ele}
+                    </Table.HeaderCell>
                   ) : (
                     <Table.HeaderCell
+                      textAlign="center"
                       key={index}
                       id="datehead"
                       style={{ cursor: "pointer" }}
@@ -223,12 +230,17 @@ export default function Admin() {
               {filtered.map((reported, index) => {
                 return (
                   <Table.Row key={reported._id} id={reported._id}>
-                    <Table.Cell>{reported.bugName}</Table.Cell>
+                    <Table.Cell>{reported.ticketID}</Table.Cell>
+                    <Table.Cell>
+                      {reported.bugName.substr(0, 10)}
+                      {reported.bugName.length > 10 ? "..." : ""}
+                    </Table.Cell>
                     <Table.Cell>
                       {reported.reportedBy ? reported.reportedBy : "Anonymous"}
                     </Table.Cell>
                     <Table.Cell>
-                      {reported.bugDescription.substr(0, 15) + "...."}
+                      {reported.bugDescription.substr(0, 15)}
+                      {reported.bugDescription.length > 10 ? "..." : ""}
                     </Table.Cell>
                     <Table.Cell>
                       <select
@@ -293,7 +305,7 @@ export default function Admin() {
                         View
                       </button>
                     </Table.Cell>
-                    <Table.Cell>
+                    <Table.Cell colSpan="2">
                       {reported.status === "Fixed" ? (
                         "Fixed By: " +
                         (reported.fixedBy ? reported.fixedBy : "Anonymous User")
@@ -368,6 +380,9 @@ export default function Admin() {
       </div>
     </>
   ) : (
-    <h1>Loading......</h1>
+    <div className="loading-body">
+      <div className="loader" id="loader"></div>
+      <span>Loading</span>
+    </div>
   );
 }

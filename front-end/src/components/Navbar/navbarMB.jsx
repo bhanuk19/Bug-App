@@ -69,7 +69,7 @@ function NavbarMb({ logged, destroySession }) {
                 simple
                 className="link item"
                 direction="right"
-                style={{fontSize: "20px"}}
+                style={{ fontSize: "20px" }}
               >
                 <Dropdown.Menu>
                   <Dropdown.Header>Action Center</Dropdown.Header>
@@ -149,7 +149,7 @@ function NavbarMb({ logged, destroySession }) {
             name="Login"
             active={activeItem === "Login"}
             as={Link}
-            to="login"
+            to="authenticate"
             position="right"
           />
         )}

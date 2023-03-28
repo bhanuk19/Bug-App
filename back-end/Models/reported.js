@@ -6,6 +6,10 @@ const Schema = _Schema;
 
 const Reported = new Schema(
   {
+    ticketID: {
+      type: String,
+      required: true,
+    },
     bugName: { type: String, required: true },
     bugURL: String,
     bugDescription: String,
@@ -24,9 +28,9 @@ const Reported = new Schema(
       type: String,
       default: "",
     },
-    fixedBy:{
+    fixedBy: {
       type: String,
-      default:""
+      default: "",
     },
     bugImages: {
       type: Array,

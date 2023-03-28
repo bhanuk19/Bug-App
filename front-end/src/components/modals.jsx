@@ -73,6 +73,9 @@ export const Modal = ({
         {bug["_id"]}
       </span>
       <span>
+        <b>Ticket ID: {bug.ticketID}</b>
+      </span>
+      <span>
         <b>Bug: </b>
         {bug.bugName}
         <sub
@@ -189,28 +192,35 @@ export const Modal = ({
       ) : (
         <></>
       )}
-      {bug.status === "Fixed" ? (
-        <></>
-      ) : (
-        <div>
-          {bug.status === "Approved" ? (
-            <button onClick={handleApproval} style={{ background: "#218838" }}>
-              Approve
-            </button>
-          ) : (
-            <></>
-          )}
-          {bug.status === "Rejected" ? (
-            <button onClick={handleReject} style={{ background: "#DC3545" }}>
-              Reject
-            </button>
-          ) : (
-            <></>
-          )}
-        </div>
-      )}
+      <div>{functionalities(bug, handleApproval, handleReject)}</div>
     </div>
   );
+};
+const functionalities = (bug, handleApproval, handleReject) => {
+  if (bug.status === "Fixed" || bug.status === "Assigned") return <></>;
+  else if (bug.status === "Approved")
+    return (
+      <button onClick={handleReject} style={{ background: "#DC3545" }}>
+        Reject
+      </button>
+    );
+  else if (bug.status === "Rejected")
+    return (
+      <button onClick={handleApproval} style={{ background: "#218838" }}>
+        Approve
+      </button>
+    );
+  else
+    return (
+      <>
+        <button onClick={handleApproval} style={{ background: "#218838" }}>
+          Approve
+        </button>
+        <button onClick={handleReject} style={{ background: "#DC3545" }}>
+          Reject
+        </button>
+      </>
+    );
 };
 
 export const FixModal = ({
@@ -279,6 +289,10 @@ export const FixModal = ({
     <div className="more-details">
       <span className="close-button">
         <i className="fa-regular fa-circle-xmark" onClick={handleHide}></i>
+      </span>
+      <span>
+        <b>TicketID: </b>
+        {bug["fixID"]}
       </span>
       <span>
         <b>FixID: </b>
@@ -361,7 +375,6 @@ export const ApprovedModal = ({
     dispatcher(setSelected(id));
     navigate("/bug-hunter/fix");
   };
-  console.log(bug);
   return (
     <div className="more-details">
       <span className="close-button">
@@ -370,6 +383,10 @@ export const ApprovedModal = ({
       <span>
         <b>ID: </b>
         {bug["_id"]}
+      </span>
+      <span>
+        <b>Ticket ID: </b>
+        {bug.ticketID}
       </span>
       <span>
         <b>Bug: </b>

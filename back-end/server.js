@@ -24,7 +24,7 @@ app.post("/auth", (req, res) => {
     .post(
       process.env.server + "/checkAuth",
       {
-        session_id: req.body.session_id,
+        session_id: req.cookies.session_id,
       },
       {
         headers: {
@@ -62,7 +62,9 @@ app.use((req, res, next) => {
     axios
       .post(
         process.env.server + "/checkAuth",
-        { session_id: req.cookies.session_id },
+        req.query.apikey
+          ? { session_id: req.query.key }
+          : { session_id: req.cookies.session_id },
         {
           headers: {
             "Content-Type": "application/json",
@@ -79,6 +81,13 @@ app.use((req, res, next) => {
           });
         }
       });
+  } else if (req.query.apikey) {
+    apikey.findOne({ key: req.query.apikey }, (err, doc) => {
+      if (doc) {
+        req.admin = false;
+        next();
+      }
+    });
   } else {
     res.status(403).send("Forbidden");
   }
@@ -103,11 +112,18 @@ app.get("/health", async (req, res) => {
   };
   res.send(health);
 });
+app.post("/nameChecker", (req, res) => {
+  Reported.findOne({ bugName: req.body.name }, (err, doc) => {
+    if (err) throw err;
+    res.status(200).send(doc === null ? false : true);
+  });
+});
 
 import users from "./routes/users";
 app.use(users); //Using User Routes
 
 import admin from "./routes/admin";
+import apikey from "./Models/apikey";
 app.use(admin); //Using Admin Routes
 
 app.listen(process.env.PORT, (req, res) => {

@@ -45,7 +45,7 @@ app.post("/fixhandle", (req, res) => {
       (err, doc) => {
         Reported.findByIdAndUpdate(
           doc.bugID,
-          { status: req.body.updateStatus },
+          { status: req.body.updateStatus, fixedBy: doc.fixAddedBy },
           (err, doc) => {
             res.status(200).send("Ok");
           }
@@ -104,9 +104,11 @@ app.post("/updatePriority", (req, res) => {
 });
 //Assigning a bug to a particular user
 app.post("/assignBug", (req, res) => {
+  let status = "Assigned";
+  if (req.body.username === "Not Assigned") status = "reported";
   Reported.findByIdAndUpdate(
     req.body._id,
-    { assignedTo: req.body.username, status: "Assigned" },
+    { assignedTo: req.body.username, status: status },
     { new: true },
     (err, doc) => {
       if (!err) {

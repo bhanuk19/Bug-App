@@ -5,9 +5,10 @@ import { sortDateAscend, sortDateDesc } from "../functions/filters";
 import { Header, Pagination, Table } from "semantic-ui-react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { isArray } from "lodash";
 export default function Fixes() {
   const tableHead = [
-    "FixID",
+    "TicketID",
     "Added By",
     "Description",
     "Status",
@@ -49,14 +50,15 @@ export default function Fixes() {
     setAscend(!ascend);
   };
   const handleSearch = (e) => {
-    let filteredBySearch = fixes.filter((row) => {
+    let filteredData = fixes.filter((row) => {
       return Object.values(row).some((value) => {
-        if (isNaN(value))
-          return value.toLowerCase().includes(e.target.value.toLowerCase());
+        if (isNaN(value) || !isArray(value)) {
+          return String(value).toLowerCase().includes(e.target.value.toLowerCase());
+        }
         return false;
       });
     });
-    setFiltered(filteredBySearch);
+    setFiltered(filteredData);
   };
   return filtered ? (
     <>
@@ -107,8 +109,8 @@ export default function Fixes() {
                     className="fix-bug-list-element"
                     id={fix._id}
                   >
-                    <Table.Cell>{fix._id}</Table.Cell>
-                    <Table.Cell>{fix.fixedBy}</Table.Cell>
+                    <Table.Cell>{fix.fixID}</Table.Cell>
+                    <Table.Cell>{fix.fixAddedBy}</Table.Cell>
                     <Table.Cell>
                       {fix.fixDescription.substr(0, 10) + "...."}
                     </Table.Cell>
@@ -175,6 +177,9 @@ export default function Fixes() {
       </div>
     </>
   ) : (
-    <h1>Loading......</h1>
+    <div className="loading-body">
+      <div className="loader" id="loader"></div>
+      <span>Loading</span>
+    </div>
   );
 }

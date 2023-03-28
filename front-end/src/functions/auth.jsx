@@ -13,12 +13,16 @@ export const checkAuth = async () => {
     );
     return res.data[0];
   } else {
-    // cookie.set("session_id", "", { path: "/", expires: new Date() });
     return false;
   }
 };
-// dispatcher(setLogins([res.data, sessionStorage.getItem("username")]));
-//           navigate("/bug-hunter");
+
+export const clearCookie = () => {
+  Object.keys(cookie.getAll()).map((ele) => {
+    cookie.set(ele, "", { path: "/", expires: new Date() });
+    return true;
+  });
+};
 
 export const logout = async () => {
   let flag = false;
@@ -35,10 +39,7 @@ export const logout = async () => {
     )
     .then((response) => response.data)
     .then((data) => {
-      Object.keys(cookie.getAll()).map((ele) => {
-        cookie.set(ele, "", { path: "/", expires: new Date() });
-        return 0;
-      });
+      clearCookie();
       flag = data;
     });
   return flag;

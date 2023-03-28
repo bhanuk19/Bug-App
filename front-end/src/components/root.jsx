@@ -4,9 +4,8 @@ import { Outlet } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import Cookies from "universal-cookie";
 import { useDispatch } from "react-redux";
-import { checkAuth } from "../functions/auth";
+import { checkAuth, clearCookie } from "../functions/auth";
 import { setAdmin, setLogins } from "../reducers/globalStates";
-
 export default function Root(props) {
   const dispatcher = useDispatch();
   const cookie = new Cookies();
@@ -19,12 +18,9 @@ export default function Root(props) {
           setAdmin(cookie.get("admin") === "true")
         );
       } else {
-        Object.keys(cookie.getAll()).map((ele) => {
-          cookie.set(ele, "", { path: "/", expires: new Date() });
-          return 0;
-        });
+        clearCookie();
         dispatcher(setLogins([false, null]), setAdmin(false));
-        navigate("/bug-hunter/login");
+        navigate("/bug-hunter/authenticate");
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps

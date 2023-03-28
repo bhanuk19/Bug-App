@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { Icon, Menu, Segment, Dropdown } from "semantic-ui-react";
 import Cookies from "universal-cookie";
 export default function NavbarLg({ destroySession, logged }) {
   const cookie = new Cookies();
-  const [activeItem, setactiveItem] = useState("home");
+  const [activeItem, setactiveItem] = useState("");
   const handleItemClick = (e, { name }) => setactiveItem(name);
   return (
     <Segment inverted attached size="mini">
@@ -15,7 +15,7 @@ export default function NavbarLg({ destroySession, logged }) {
               name="Dashboard"
               active={activeItem === "Dashboard"}
               onClick={handleItemClick}
-              as={Link}
+              as={NavLink}
               to="dashboard"
               className="home-link"
             />
@@ -25,21 +25,21 @@ export default function NavbarLg({ destroySession, logged }) {
                   name="Fixes"
                   active={activeItem === "Fixes"}
                   onClick={handleItemClick}
-                  as={Link}
+                  as={NavLink}
                   to="fixes"
                 />
                 <Menu.Item
                   name="Reported"
                   active={activeItem === "Reported"}
                   onClick={handleItemClick}
-                  as={Link}
+                  as={NavLink}
                   to="reported"
                 />
                 <Menu.Item
                   name="Analytics"
                   active={activeItem === "Analytics"}
                   onClick={handleItemClick}
-                  as={Link}
+                  as={NavLink}
                   to="analytics"
                 />
               </>
@@ -50,14 +50,14 @@ export default function NavbarLg({ destroySession, logged }) {
               name="Assigned"
               active={activeItem === "Assigned"}
               onClick={handleItemClick}
-              as={Link}
+              as={NavLink}
               to="assigned"
             />
             <Menu.Item
               name="Report"
               active={activeItem === "Report"}
               onClick={handleItemClick}
-              as={Link}
+              as={NavLink}
               to="report"
             />
 
@@ -70,8 +70,7 @@ export default function NavbarLg({ destroySession, logged }) {
               >
                 <Dropdown.Menu>
                   <Dropdown.Header>Action Center</Dropdown.Header>
-                  <Dropdown.Item as={Link} to="profile/bugs">Your Bugs</Dropdown.Item>
-                  <Dropdown.Item as={Link} to="profile/fixes">Your Fixes</Dropdown.Item>
+                  <Dropdown.Item as={NavLink} to="profile/bugs">Your Bugs</Dropdown.Item>
                   <Dropdown.Divider />
                   <Dropdown.Header>Bye....</Dropdown.Header>
                   <Dropdown.Item
@@ -92,8 +91,8 @@ export default function NavbarLg({ destroySession, logged }) {
           <Menu.Item
             name="Login"
             active={activeItem === "Login"}
-            as={Link}
-            to="login"
+            as={NavLink}
+            to="authenticate"
             position="right"
           />
         )}

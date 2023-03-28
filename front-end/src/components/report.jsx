@@ -32,7 +32,7 @@ export default function Report() {
     }
   };
 
-  const handleReport = () => {
+  const handleReport = (e) => {
     if (bugName === "") {
       document.getElementById("err").innerHTML = "Bug Name cannot be empty!";
       return;
@@ -59,7 +59,6 @@ export default function Report() {
     }
     let data = new FormData(document.querySelector("form"));
     let keys = Object.keys(images);
-    keys.pop();
     keys.map((key) => {
       data.append("images", images[key]);
       return 0;
@@ -72,6 +71,7 @@ export default function Report() {
         },
       })
       .then((response) => {
+        e.target.setAttribute("disabled", true);
         if (response.status === 201) {
           alert("Success");
           navigate("/bug-hunter/dashboard");

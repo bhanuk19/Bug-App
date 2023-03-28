@@ -11,6 +11,7 @@ import Reported from "../Models/reported";
 import Fixes from "../Models/fixes";
 //
 import { sortDateDesc } from "../functions/filters";
+import Counter from "../Models/counter";
 
 //Multer Functions for Uploading Images from request with unique names
 const storage = multer.diskStorage({
@@ -52,13 +53,21 @@ app.post("/reportBug", upload.array("images"), (req, res) => {
     for (var i = 0; i < req.files.length; i++) {
       bugImages.push(url + "/uploads/" + req.files[i].filename);
     }
-    let newReport = new Reported({ ...req.body, bugImages: bugImages });
-    newReport.save((err, doc) => {
-      if (!err) {
-        res.status(201).send("Ok");
-      } else {
-        console.log("Error during record insertion : " + err);
-      }
+    Counter.find({}, async (err, data) => {
+      data[0].reportTicket += 1;
+      let newReport = new Reported({
+        ticketID: "TK_" + data[0].reportTicket,
+        ...req.body,
+        bugImages: bugImages,
+      });
+      newReport.save((err, doc) => {
+        if (!err) {
+          res.status(201).send("Ok");
+        } else {
+          console.log("Error during record insertion : " + err);
+        }
+      });
+      await Counter.findByIdAndUpdate(data[0]["_id"], data[0], { new: true });
     });
   }
 });
@@ -66,13 +75,21 @@ app.post("/addFix", (req, res) => {
   if (req.body.fixDescription === undefined) {
     res.status(204).send("Succeess");
   } else {
-    let newFix = new Fixes(req.body);
-    newFix.save((err, doc) => {
-      if (!err) {
-        res.status(201).send("Ok");
-      } else {
-        console.log("Error during record insertion : " + err);
-      }
+    Counter.find({}, async (err, data) => {
+      data[0].fixTicket += 1;
+      let newFix = new Fixes({
+        fixID: "FX_" + data[0].fixTicket,
+        ...req.body,
+        fixAddedBy: req.cookies.username,
+      });
+      newFix.save((err, doc) => {
+        if (!err) {
+          res.status(201).send("Ok");
+        } else {
+          console.log("Error during record insertion : " + err);
+        }
+      });
+      await Counter.findByIdAndUpdate(data[0]["_id"], data[0], { new: true });
     });
   }
 });
@@ -81,7 +98,7 @@ app.get("/bugs/:page", (req, res) => {
   Reported.find({}, (err, data) => {
     data = sortDateDesc(R.filter(R.propEq("status", "Approved"), data));
     let length = data.length;
-    req.params.page === "All".toLowerCase()
+    req.params.page.toLowerCase() === "all"
       ? res.send(data)
       : res
           .status(200)
@@ -95,22 +112,47 @@ app.get("/bugs/:page", (req, res) => {
   });
 });
 
-app.get("/userBugs/:username", (req, res) => {
+app.get(["/userBugs/:page", "/userBugs/:page/:username"], (req, res) => {
   Reported.find(
     {
       $or: [
-        { reportedBy: req.params.username },
-        { assignedTo: req.params.username },
+        {
+          reportedBy: req.query.apikey
+            ? req.body.username
+            : req.params.username
+            ? req.params.username
+            : req.cookies.username,
+        },
+        {
+          assignedTo: req.query.apikey
+            ? req.body.username
+            : req.params.username
+            ? req.params.username
+            : req.cookies.username,
+        },
+        {
+          fixedBy: req.query.apikey
+            ? req.body.username
+            : req.params.username
+            ? req.params.username
+            : req.cookies.username,
+        },
       ],
     },
-    (err, doc) => {
-      Fixes.find({ fixedBy: req.params.username }, (err, doc2) => {
-        doc2.map((ele) => {
-          doc.push(ele);
-        });
-        if (!err) res.status(200).send(doc);
-        else res.send(false);
-      });
+    (err, data) => {
+      data = sortDateDesc(data);
+      let length = data.length;
+      req.params.page.toLowerCase() === "All"
+        ? res.send(data)
+        : res
+            .status(200)
+            .send([
+              data.splice(
+                parseInt(req.params.page) ? parseInt(req.params.page) * 10 : 0,
+                10
+              ),
+              length,
+            ]);
     }
   );
 });
@@ -118,7 +160,7 @@ app.get("/userBugs/:username", (req, res) => {
 app.get("/assigned/:page", (req, res) => {
   let sid = req.cookies.session_id;
   axios.get(process.env.server + "/userName/" + sid).then((resp) => {
-    if (resp.data) {
+    if (resp.data !== null) {
       Reported.find({ assignedTo: resp.data }, (err, data) => {
         data = sortDateDesc(data);
         let length = data.length;

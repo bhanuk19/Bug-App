@@ -7,7 +7,7 @@ connect(process.env.MONGO_URL + process.env.Database, {
   useNewUrlParser: true,
 });
 const conn = connection;
-conn.on("connected",  () =>{
+conn.on("connected", () => {
   console.log("database is connected successfully");
 });
 conn.on("error", console.error.bind(console, "connection error:"));

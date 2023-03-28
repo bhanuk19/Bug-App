@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Header, Pagination, Search, Table } from "semantic-ui-react";
+import { Header, Pagination, Table } from "semantic-ui-react";
 import { ApprovedModal } from "./modals";
 import { sortDateAscend, sortDateDesc } from "../functions/filters";
 import axios from "axios";
 import * as R from "ramda";
 import { useNavigate } from "react-router-dom";
+import { isArray } from "lodash";
 
 export default function Assigned() {
   const [assigned, setAssigned] = useState(false);
@@ -17,6 +18,7 @@ export default function Assigned() {
   const [pages, setPages] = useState(null);
   const [activePage, setActivePage] = useState(0);
   const tableHead = [
+    "TicketID",
     "Bug Name",
     "Reporter",
     "Description",
@@ -71,11 +73,24 @@ export default function Assigned() {
     setID(e.target.parentNode.parentNode.id);
     setVisibility(true);
   };
+  const handleSearch = (e) => {
+    let filteredData = assigned.filter((row) => {
+      return Object.values(row).some((value) => {
+        if (isNaN(value) || !isArray(value)) {
+          return String(value)
+            .toLowerCase()
+            .includes(e.target.value.toLowerCase());
+        }
+        return false;
+      });
+    });
+    setFiltered(filteredData);
+  };
   return filtered ? (
     <>
       <div className="form-div">
         <div className="head-div">
-          <Header size="huge">Reported Bugs</Header>
+          <Header size="huge">Assigned Tickets</Header>
           <div>
             <h3>Filters: </h3>
             <label htmlFor="All" className="filter-label">
@@ -106,10 +121,19 @@ export default function Assigned() {
               />{" "}
               Fixed
             </label>
-            <Search placeholder="Search..." />
+            <div className="search">
+              <input
+                type="text"
+                className="searchTerm"
+                id="searchBar"
+                placeholder="Search in this page.."
+                onChange={handleSearch}
+              />
+              <i className="fa fa-search searchButton"></i>
+            </div>
           </div>
         </div>
-        {filtered.lenght ? (
+        {filtered.length ? (
           <Table celled inverted selectable fixed>
             <Table.Header>
               <Table.Row>
@@ -137,12 +161,17 @@ export default function Assigned() {
               {filtered.map((reported, index) => {
                 return (
                   <Table.Row key={reported._id} id={reported._id}>
-                    <Table.Cell>{reported.bugName}</Table.Cell>
+                    <Table.Cell>{reported.ticketID}</Table.Cell>
+                    <Table.Cell>
+                      {reported.bugName.substr(0, 10)}
+                      {reported.bugName.length > 10 ? "..." : ""}
+                    </Table.Cell>
                     <Table.Cell>
                       {reported.reportedBy ? reported.reportedBy : "Anonymous"}
                     </Table.Cell>
                     <Table.Cell>
-                      {reported.bugDescription.substr(0, 15) + "...."}
+                      {reported.bugDescription.substr(0, 15)}
+                      {reported.bugDescription.length > 15 ? "..." : ""}
                     </Table.Cell>
                     <Table.Cell
                       style={
@@ -240,6 +269,9 @@ export default function Assigned() {
       </div>
     </>
   ) : (
-    <h1>Loading......</h1>
+    <div className="loading-body">
+      <div className="loader" id="loader"></div>
+      <span>Loading</span>
+    </div>
   );
 }

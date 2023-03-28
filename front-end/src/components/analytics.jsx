@@ -2,7 +2,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PieChart, Pie, Sector, ResponsiveContainer } from "recharts";
-import Cookies from "universal-cookie";
+import { clearCookie } from "../functions/auth";
 // import { Search, Grid, Header, Segment } from "semantic-ui-react";
 
 const renderActiveShape = (props) => {
@@ -106,17 +106,12 @@ export default function Analytics() {
           alert("Unauthorized");
           navigate("/dashboard");
         } else {
-          //   console.log(response);
-          //   alert("wait");
           setReported(response.data);
-
-          //   setFrequency(frequency);
           getUsers();
         }
       })
       .catch((err) => {
-        let cookie = new Cookies();
-        cookie.set("session_id", "", { path: "/", expires: new Date() });
+        clearCookie();
         navigate("/bug-hunter/login");
       });
   };
@@ -158,19 +153,24 @@ export default function Analytics() {
   };
 
   const showUserAnalytics = (e) => {
+    if (e.target.value === "") {
+      setUserFrequency(false);
+      setSelectedUser("");
+      return;
+    }
     axios
-      .get("/userBugs/" + e.target.value)
+      .get("/userBugs/All/" + e.target.value)
       .then((response) => {
         let temp = {
           reported: 0,
           assigned: 0,
           fixed: 0,
         };
-        response.data.map((ele) => {
+        response.data[0].map((ele) => {
           if (ele["reportedBy"] === e.target.value) {
             temp["reported"] += 1;
           }
-          if (ele["fixedBy" && ele["status"] === "Fixed"] === e.target.value) {
+          if (ele["fixedBy"] === e.target.value) {
             temp["fixed"] += 1;
           }
           if (ele["assignedTo"] === e.target.value) {
@@ -215,12 +215,12 @@ export default function Analytics() {
         </div>
         <div style={stylesReports}>
           <h1>Select Reporter</h1>
-          <div class="row" style={{ width: "80%" }}>
-            <div class="col-md-3">&nbsp;</div>
-            <div class="col-md-6">
+          <div className="row" style={{ width: "80%" }}>
+            <div className="col-md-3">&nbsp;</div>
+            <div className="col-md-6">
               <select
                 name="select_box"
-                class="form-select"
+                className="form-select"
                 id="select_box"
                 onChange={showUserAnalytics}
               >
@@ -236,7 +236,7 @@ export default function Analytics() {
                 )}
               </select>
             </div>
-            <div class="col-md-3">&nbsp;</div>
+            <div className="col-md-3">&nbsp;</div>
           </div>
         </div>
       </div>
@@ -244,7 +244,7 @@ export default function Analytics() {
         {userFrequency ? (
           <div style={stylesReports}>
             <h1>
-              Fequency of{" "}
+              Frequency of{" "}
               <span style={{ color: "#8884D8", fontSize: "2rem" }}>
                 {selectedUser}
               </span>
@@ -272,6 +272,9 @@ export default function Analytics() {
       </div>
     </>
   ) : (
-    <h1>Loading.....</h1>
+    <div className="loading-body">
+      <div className="loader" id="loader"></div>
+      <span>Loading</span>
+    </div>
   );
 }

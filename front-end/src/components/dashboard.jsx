@@ -8,6 +8,7 @@ import { sortDateAscend, sortDateDesc } from "../functions/filters";
 // import { useNavigate } from "react-router-dom";
 // import Cookies from "universal-cookie";
 import { Table, Header, Pagination } from "semantic-ui-react";
+import { isArray } from "lodash";
 export default function Dashboard(props) {
   //Local States
   // const cookie = new Cookies();
@@ -22,7 +23,7 @@ export default function Dashboard(props) {
   const [filtered, setFiltered] = useState(false);
   const [activePage, setActivePage] = useState(0);
   const tableHead = [
-    "id",
+    "ticketID",
     "Bug Name",
     "Reporter",
     "Description",
@@ -33,7 +34,6 @@ export default function Dashboard(props) {
   useEffect(() => {
     axios.get("/bugs/" + activePage).then((response) => {
       setApproved(response.data[0]);
-      console.log(response.data);
       setPages(Math.ceil(response.data[1] / 10));
       setFiltered(response.data[0]);
     });
@@ -54,15 +54,17 @@ export default function Dashboard(props) {
     setAscend(!ascend);
   };
   const handleSearch = (e) => {
-    let filteredBySearch = approvedBugs.filter((row) => {
+    let filteredData = approvedBugs.filter((row) => {
       return Object.values(row).some((value) => {
-        if (isNaN(value))
-          return value.toLowerCase().includes(e.target.value.toLowerCase());
+        if (isNaN(value) || !isArray(value)) {
+          return String(value)
+            .toLowerCase()
+            .includes(e.target.value.toLowerCase());
+        }
         return false;
       });
     });
-    setFiltered(filteredBySearch);
-    console.log("search", filtered);
+    setFiltered(filteredData);
   };
   return (
     <>
@@ -115,15 +117,19 @@ export default function Dashboard(props) {
                         className="reported-bug-list-element"
                         id={reported._id}
                       >
-                        <Table.Cell>{reported._id}</Table.Cell>
-                        <Table.Cell>{reported.bugName}</Table.Cell>
+                        <Table.Cell>{reported.ticketID}</Table.Cell>
+                        <Table.Cell>
+                          {reported.bugName.substr(0, 10)}
+                          {reported.bugName.length > 10 ? "..." : ""}
+                        </Table.Cell>
                         <Table.Cell>
                           {reported.reportedBy
                             ? reported.reportedBy
                             : "Anonymous"}
                         </Table.Cell>
                         <Table.Cell>
-                          {reported.bugDescription?.substr(0, 15) + "...."}
+                          {reported.bugDescription?.substr(0, 15)}
+                          {reported.bugDescription.length > 15 ? "..." : ""}
                         </Table.Cell>
                         <Table.Cell
                           style={
@@ -223,7 +229,10 @@ export default function Dashboard(props) {
           </div>
         </>
       ) : (
-        <h1>Loading......</h1>
+        <div className="loading-body">
+          <div className="loader" id="loader"></div>
+          <span>Loading</span>
+        </div>
       )}
     </>
   );

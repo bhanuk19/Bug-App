@@ -7,14 +7,11 @@ import Admin from "./components/admin";
 import Root from "./components/root";
 import Dashboard from "./components/dashboard";
 import Fix from "./components/fix";
-import Health from "./components/health";
 import Fixes from "./components/fixes";
 import Auth from "./components/auth";
-import Fixed from "./components/fixed";
 import Reported from "./components/reported";
 import Assigned from "./components/assigned";
 import Analytics from "./components/analytics";
-import Temp from "./components/temp";
 
 const router = createBrowserRouter([
   {
@@ -64,18 +61,6 @@ const router = createBrowserRouter([
       {
         path: "profile/bugs",
         element: <Reported />,
-      },
-      {
-        path: "profile/fixes",
-        element: <Fixed />,
-      },
-      {
-        path: "health",
-        element: <Health />,
-      },
-      {
-        path: "temp",
-        element: <Temp />,
       },
       {
         path: "*",

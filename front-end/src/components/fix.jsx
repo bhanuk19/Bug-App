@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-// import { setSelected } from "../reducers/selectBug";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import Cookies from "universal-cookie";
+
 export default function Fix(props) {
-  const cookie = new Cookies();
   const navigate = useNavigate();
   const selectedBug = useSelector((state) => state.globalStates.value);
 
@@ -44,8 +42,7 @@ export default function Fix(props) {
         },
       })
       .then(() => {
-        alert("Fix Submitted!");
-        navigate("/bug-hunter/dashboard");
+        navigate("/bug-hunter/profile/bugs");
       });
   };
   useEffect(() => {
@@ -62,13 +59,6 @@ export default function Fix(props) {
           {selectedBug}
         </span>
         <input type="text" name="bugID" defaultValue={selectedBug} hidden />
-        <input
-          type="text"
-          name="fixedBy"
-          hidden
-          required
-          defaultValue={cookie.get("username")}
-        />
         <input
           type="url"
           name="fixURL"
