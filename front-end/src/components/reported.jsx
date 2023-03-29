@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { clearCookie } from "../functions/auth";
 import * as R from "ramda";
 import { isArray } from "lodash";
+import { NavLink } from "react-router-dom";
 export default function Reported(props) {
   //Local States
   const [userBugs, setUserBugs] = useState(false);
@@ -188,7 +189,13 @@ export default function Reported(props) {
                         className="reported-bug-list-element"
                         id={reported._id}
                       >
-                        <Table.Cell>{reported.ticketID}</Table.Cell>
+                        <Table.Cell>
+                          <NavLink
+                            to={"/bug-hunter/ticket/" + reported.ticketID}
+                          >
+                            {reported.ticketID}
+                          </NavLink>
+                        </Table.Cell>
                         <Table.Cell>
                           {reported.bugName.substr(0, 10)}
                           {reported.bugName.length > 10 ? "..." : ""}

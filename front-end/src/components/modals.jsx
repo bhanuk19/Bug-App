@@ -5,6 +5,7 @@ import "../Styles/style.css";
 import { useDispatch } from "react-redux";
 import { setSelected } from "../reducers/globalStates";
 import { useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 export const Modal = ({
   setAction,
@@ -73,7 +74,12 @@ export const Modal = ({
         {bug["_id"]}
       </span>
       <span>
-        <b>Ticket ID: {bug.ticketID}</b>
+        <b>
+          Ticket ID:{" "}
+          <NavLink to={"/bug-hunter/ticket/" + bug.ticketID}>
+            {bug.ticketID}
+          </NavLink>
+        </b>
       </span>
       <span>
         <b>Bug: </b>
@@ -292,7 +298,7 @@ export const FixModal = ({
       </span>
       <span>
         <b>TicketID: </b>
-        {bug["fixID"]}
+        <NavLink to={"/bug-hunter/ticket/" + bug.fixID}>{bug.fixID}</NavLink>
       </span>
       <span>
         <b>FixID: </b>
@@ -386,7 +392,9 @@ export const ApprovedModal = ({
       </span>
       <span>
         <b>Ticket ID: </b>
-        {bug.ticketID}
+        <NavLink to={"/bug-hunter/ticket/" + bug.ticketID}>
+          {bug.ticketID}
+        </NavLink>
       </span>
       <span>
         <b>Bug: </b>

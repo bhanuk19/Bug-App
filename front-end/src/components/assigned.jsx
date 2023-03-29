@@ -6,6 +6,7 @@ import axios from "axios";
 import * as R from "ramda";
 import { useNavigate } from "react-router-dom";
 import { isArray } from "lodash";
+import { NavLink } from "react-router-dom";
 
 export default function Assigned() {
   const [assigned, setAssigned] = useState(false);
@@ -161,7 +162,11 @@ export default function Assigned() {
               {filtered.map((reported, index) => {
                 return (
                   <Table.Row key={reported._id} id={reported._id}>
-                    <Table.Cell>{reported.ticketID}</Table.Cell>
+                    <Table.Cell>
+                      <NavLink to={"/bug-hunter/ticket/" + reported.ticketID}>
+                        {reported.ticketID}
+                      </NavLink>
+                    </Table.Cell>
                     <Table.Cell>
                       {reported.bugName.substr(0, 10)}
                       {reported.bugName.length > 10 ? "..." : ""}

@@ -11,7 +11,7 @@ export const checkAuth = async () => {
         headers: { "Content-Type": "application/json" },
       }
     );
-    return res.data[0];
+    return res.data.sessionExist;
   } else {
     return false;
   }

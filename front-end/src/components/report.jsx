@@ -28,8 +28,8 @@ export default function Report() {
       let tempImages = { ...images };
       tempImages[fileCount] = e.target.files[0];
       setImages({ ...tempImages });
-      e.target.value = "";
     }
+    e.target.value = "";
   };
 
   const handleReport = (e) => {
@@ -83,9 +83,14 @@ export default function Report() {
   };
   const deleteImage = (index) => {
     let temp = { ...images };
-    delete temp[index];
-    setImages(temp);
-    setFileCount((fileCount) => fileCount - 1);
+    if (Object.keys(temp).length === 1) {
+      setImages({});
+      setFileCount(0);
+    } else {
+      delete temp[index];
+      setImages(temp);
+      setFileCount((fileCount) => fileCount - 1);
+    }
   };
   useEffect(() => {
     if (bugName === "") {

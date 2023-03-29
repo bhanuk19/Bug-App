@@ -359,3 +359,6 @@ textarea:focus {
     transform: rotate(360deg);
   }
 }
+.form-div a:hover {
+  color: #ffe100 !important;
+}

@@ -116,6 +116,14 @@ export default function Analytics() {
       });
   };
   // eslint-disable-next-line react-hooks/exhaustive-deps
+  const color = {
+    reported: "#056EC1",
+    fixed: "#13AA50",
+    assigned: "#F8C400",
+    approved: "#C0D8F2",
+    rejected: "#EC0900",
+  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(getFrequncy, []);
   useEffect(() => {
     if (reportedBugs) {
@@ -126,10 +134,15 @@ export default function Analytics() {
       freq["reported"] = reportedBugs.length;
       let temp = [];
       Object.keys(freq).forEach((ele) => {
-        temp.push({ name: ele, value: freq[ele] });
+        temp.push({
+          name: ele,
+          value: freq[ele],
+          fill: color[ele.toLowerCase()],
+        });
       });
       setFrequency(temp);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reportedBugs]);
   const getUsers = () => {
     // axios.get("http://localhost:3050/users").then((resp) => {
@@ -162,25 +175,29 @@ export default function Analytics() {
       .get("/userBugs/All/" + e.target.value)
       .then((response) => {
         let temp = {
-          reported: 0,
-          assigned: 0,
-          fixed: 0,
+          Reported: 0,
+          Assigned: 0,
+          Fixed: 0,
         };
         response.data[0].map((ele) => {
           if (ele["reportedBy"] === e.target.value) {
-            temp["reported"] += 1;
+            temp["Reported"] += 1;
           }
           if (ele["fixedBy"] === e.target.value) {
-            temp["fixed"] += 1;
+            temp["Fixed"] += 1;
           }
           if (ele["assignedTo"] === e.target.value) {
-            temp["assigned"] += 1;
+            temp["Assigned"] += 1;
           }
           return 0;
         });
         let userFreq = [];
         Object.keys(temp).forEach((ele) => {
-          userFreq.push({ name: ele, value: temp[ele] });
+          userFreq.push({
+            name: ele,
+            value: temp[ele],
+            fill: color[ele.toLowerCase()],
+          });
         });
         setSelectedUser(e.target.value);
         setUserFrequency(userFreq);

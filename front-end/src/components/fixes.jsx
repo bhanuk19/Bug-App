@@ -6,10 +6,12 @@ import { Header, Pagination, Table } from "semantic-ui-react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { isArray } from "lodash";
+import { NavLink } from "react-router-dom";
 export default function Fixes() {
   const tableHead = [
     "TicketID",
     "Added By",
+    "Fix Url",
     "Description",
     "Status",
     "Date",
@@ -53,7 +55,9 @@ export default function Fixes() {
     let filteredData = fixes.filter((row) => {
       return Object.values(row).some((value) => {
         if (isNaN(value) || !isArray(value)) {
-          return String(value).toLowerCase().includes(e.target.value.toLowerCase());
+          return String(value)
+            .toLowerCase()
+            .includes(e.target.value.toLowerCase());
         }
         return false;
       });
@@ -109,8 +113,13 @@ export default function Fixes() {
                     className="fix-bug-list-element"
                     id={fix._id}
                   >
-                    <Table.Cell>{fix.fixID}</Table.Cell>
+                    <Table.Cell>
+                      <NavLink to={"/bug-hunter/ticket/" + fix.fixID}>
+                        {fix.fixID}
+                      </NavLink>
+                    </Table.Cell>
                     <Table.Cell>{fix.fixAddedBy}</Table.Cell>
+                    <Table.Cell>{fix.fixURL}</Table.Cell>
                     <Table.Cell>
                       {fix.fixDescription.substr(0, 10) + "...."}
                     </Table.Cell>

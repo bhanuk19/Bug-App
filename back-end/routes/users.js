@@ -44,6 +44,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.raw());
 
+//
 app.post("/reportBug", upload.array("images"), (req, res) => {
   if (req.body.bugName === undefined) {
     res.status(204).send("Succeess");
@@ -71,6 +72,8 @@ app.post("/reportBug", upload.array("images"), (req, res) => {
     });
   }
 });
+
+//Route for submitting a fix
 app.post("/addFix", (req, res) => {
   if (req.body.fixDescription === undefined) {
     res.status(204).send("Succeess");
@@ -94,6 +97,7 @@ app.post("/addFix", (req, res) => {
   }
 });
 
+//Route to get all approved bugs
 app.get("/bugs/:page", (req, res) => {
   Reported.find({}, (err, data) => {
     data = sortDateDesc(R.filter(R.propEq("status", "Approved"), data));
@@ -112,30 +116,28 @@ app.get("/bugs/:page", (req, res) => {
   });
 });
 
+//Total bug history of a user
 app.get(["/userBugs/:page", "/userBugs/:page/:username"], (req, res) => {
   Reported.find(
     {
       $or: [
         {
-          reportedBy: req.query.apikey
-            ? req.body.username
-            : req.params.username
-            ? req.params.username
-            : req.cookies.username,
+          reportedBy:
+            req.query.apikey || req.params.username
+              ? req.params?.username
+              : req.cookies.username,
         },
         {
-          assignedTo: req.query.apikey
-            ? req.body.username
-            : req.params.username
-            ? req.params.username
-            : req.cookies.username,
+          assignedTo:
+            req.query.apikey || req.params.username
+              ? req.params?.username
+              : req.cookies.username,
         },
         {
-          fixedBy: req.query.apikey
-            ? req.body.username
-            : req.params.username
-            ? req.params.username
-            : req.cookies.username,
+          fixedBy:
+            req.query.apikey || req.params.username
+              ? req.params.username
+              : req.cookies.username,
         },
       ],
     },
@@ -157,6 +159,7 @@ app.get(["/userBugs/:page", "/userBugs/:page/:username"], (req, res) => {
   );
 });
 
+//Route for requesting assigned bugs of the user
 app.get("/assigned/:page", (req, res) => {
   let sid = req.cookies.session_id;
   axios.get(process.env.server + "/userName/" + sid).then((resp) => {
@@ -179,6 +182,18 @@ app.get("/assigned/:page", (req, res) => {
               ]);
       });
     }
+  });
+});
+
+app.get("/ticket/:ticketID", (req, res) => {
+  Reported.findOne({ ticketID: req.params.ticketID }, async (err, doc) => {
+    delete doc["__v"];
+    console.log(doc);
+    let response = {
+      ticket: doc,
+    };
+    response.fixes = await Fixes.find({ bugID: doc._id });
+    res.send(response);
   });
 });
 

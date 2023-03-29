@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { Table, Header, Pagination } from "semantic-ui-react";
 import { clearCookie } from "../functions/auth";
 import { isArray } from "lodash";
+import { NavLink } from "react-router-dom";
 
 export default function Admin() {
   const navigate = useNavigate();
@@ -230,7 +231,11 @@ export default function Admin() {
               {filtered.map((reported, index) => {
                 return (
                   <Table.Row key={reported._id} id={reported._id}>
-                    <Table.Cell>{reported.ticketID}</Table.Cell>
+                    <Table.Cell>
+                      <NavLink to={"/bug-hunter/ticket/" + reported.ticketID}>
+                        {reported.ticketID}
+                      </NavLink>
+                    </Table.Cell>
                     <Table.Cell>
                       {reported.bugName.substr(0, 10)}
                       {reported.bugName.length > 10 ? "..." : ""}

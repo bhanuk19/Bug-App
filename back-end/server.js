@@ -72,8 +72,8 @@ app.use((req, res, next) => {
         }
       )
       .then((resp) => {
-        if (resp.data[0]) {
-          req.admin = resp.data[1];
+        if (resp.data.sessionExist) {
+          req.admin = resp.data.admin;
           next();
         } else {
           res.status(401).send({

@@ -12,6 +12,7 @@ import Auth from "./components/auth";
 import Reported from "./components/reported";
 import Assigned from "./components/assigned";
 import Analytics from "./components/analytics";
+import Ticket from "./components/ticket";
 
 const router = createBrowserRouter([
   {
@@ -61,6 +62,10 @@ const router = createBrowserRouter([
       {
         path: "profile/bugs",
         element: <Reported />,
+      },
+      {
+        path: "ticket/:ticketID",
+        element: <Ticket />,
       },
       {
         path: "*",
